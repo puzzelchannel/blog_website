@@ -8,20 +8,21 @@ from .models import Post
 # Create your tests here.
 
 class BlogPostTest(TestCase):
-    def setUp(self):
-        self.user = User.objects.create(username='testing_user')
-        self.published_testing_post = Post.objects.create(
+    @classmethod
+    def setUpTestData(cls):
+        user = User.objects.create(username='testing_user')
+        cls.published_testing_post = Post.objects.create(
             title='testing published post',
             text='this is a testing published post',
             status=Post.STATUS_CHOICES[0][0],
-            author=self.user
+            author=user
         )
 
-        self.draft_testing_post = Post.objects.create(
+        cls.draft_testing_post = Post.objects.create(
             title='testing draft post',
             text='this is a testing draft post',
             status=Post.STATUS_CHOICES[1][0],
-            author=self.user
+            author=user
         )
 
     def test_post_list_by_url(self):
