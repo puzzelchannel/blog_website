@@ -1,40 +1,37 @@
-import os
-from django.shortcuts import render, get_object_or_404
-from django.shortcuts import redirect
-from .forms import NewPostForm
+from django.urls import reverse_lazy
+from django.views import generic
+
+from .forms import PostForm
 from .models import Post
 
-os.system('clear')
+
+class PostListView(generic.ListView):
+    template_name = 'blog/post_list.html'
+    context_object_name = 'posts'
+
+    def get_queryset(self):
+        return Post.objects.filter(status='pub').order_by('-datetime_modified')
 
 
-# Create your views here.
-def post_list(request):
-    posts = Post.objects.filter(status='pub')
-    context = {
-        'posts': posts,
-    }
-    return render(request, template_name='blog/post_list.html', context=context)
+class PostDetailView(generic.DetailView):
+    model = Post
+    template_name = 'blog/post_detail.html'
+    context_object_name = 'post_detail'
 
 
-def post_detail(request, id):
-    post_detail = get_object_or_404(Post, id=id)
-    context = {
-        'posts_detail': post_detail,
-    }
-    return render(request, template_name='blog/post_detail.html', context=context)
+class PostCreateView(generic.CreateView):
+    template_name = 'blog/post_create.html'
+    form_class = PostForm
 
 
-def create_post(request):
-    if request.method == 'POST':
-        form = NewPostForm(request.POST)
-        if form.is_valid():
-            form.save()
-            return redirect('posts_list')
+class PostUpdateView(generic.UpdateView):
+    model = Post
+    template_name = 'blog/post_create.html'
+    form_class = PostForm
 
-    else:
-        form = NewPostForm()
 
-    context = {
-        'create_post_form': form,
-    }
-    return render(request, template_name='blog/post_create.html', context=context)
+class PostDeleteView(generic.DeleteView):
+    model = Post
+    template_name = 'blog/post_delete.html'
+    context_object_name = 'post_delete'
+    success_url = reverse_lazy('posts_list')
